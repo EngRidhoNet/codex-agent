@@ -1,0 +1,24 @@
+{
+  "id": "pack_basic_animals_v1",
+  "title": {"en": "Basic Animals", "id": "Hewan Dasar"},
+  "description": {"en": "Starter pack", "id": "Paket pemula"},
+  "language": "en",
+  "items": [
+    {
+      "id": "cat",
+      "label": {"en": "Cat", "id": "Kucing"},
+      "modelPath": "assets/models/cat.glb",
+      "ttsText": {"en": "Cat", "id": "Kucing"},
+      "tags": ["animal", "starter"],
+      "difficulty": 1
+    },
+    {
+      "id": "dog",
+      "label": {"en": "Dog", "id": "Anjing"},
+      "modelPath": "assets/models/dog.glb",
+      "ttsText": {"en": "Dog", "id": "Anjing"},
+      "tags": ["animal", "starter"],
+      "difficulty": 1
+    }
+  ]
+}
