@@ -5,6 +5,7 @@ import 'package:google_speech/google_speech.dart';
 
 import '../../core/errors/failure.dart';
 import '../../core/utils/either.dart';
+import '../../core/utils/similarity.dart';
 import '../../domain/entities/score_entity.dart';
 
 /// Contract for speech interactions.
@@ -45,39 +46,13 @@ class _SpeechRepositoryImpl implements SpeechRepository {
       _speechToTextClient.hashCode;
       final normalizedTarget = target.toLowerCase().trim();
       final normalizedTranscript = transcript.toLowerCase().trim();
-      final distance = _levenshtein(normalizedTarget, normalizedTranscript);
-      final maxLength = normalizedTarget.isEmpty ? 1 : normalizedTarget.length;
-      final accuracy = ((maxLength - distance) / maxLength).clamp(0, 1);
-      final score = (accuracy * 100).clamp(0, 100).toDouble();
+      final similarity = Similarity.normalizedScore(normalizedTarget, normalizedTranscript);
+      final score = (similarity * 100).clamp(0, 100).toDouble();
       final wpm = normalizedTranscript.split(' ').length / (4 / 60);
       return Right(ScoreEntity(itemId: target, score: score, wpm: wpm, timestamps: const []));
     } catch (error) {
       return Left(Failure('Unable to evaluate pronunciation', cause: error));
     }
-  }
-
-  int _levenshtein(String a, String b) {
-    if (a == b) return 0;
-    if (a.isEmpty) return b.length;
-    if (b.isEmpty) return a.length;
-    final matrix = List.generate(a.length + 1, (_) => List.filled(b.length + 1, 0));
-    for (var i = 0; i <= a.length; i++) {
-      matrix[i][0] = i;
-    }
-    for (var j = 0; j <= b.length; j++) {
-      matrix[0][j] = j;
-    }
-    for (var i = 1; i <= a.length; i++) {
-      for (var j = 1; j <= b.length; j++) {
-        final cost = a[i - 1] == b[j - 1] ? 0 : 1;
-        matrix[i][j] = [
-          matrix[i - 1][j] + 1,
-          matrix[i][j - 1] + 1,
-          matrix[i - 1][j - 1] + cost,
-        ].reduce((value, element) => value < element ? value : element);
-      }
-    }
-    return matrix[a.length][b.length];
   }
 }
 
